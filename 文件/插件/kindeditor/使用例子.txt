@@ -1,0 +1,12 @@
+<script src="ke4/kindeditor-min.js"></script>引JS
+<script>
+KindEditor.ready(function(K) {
+	K.create('#ke_demo', {
+		allowFileManager : true
+	});
+});
+</script>
+创建
+<textarea id="ke_demo" name="content" style="width:95%;height:200px;visibility:hidden;">
+</textarea>
+这样就可以。。

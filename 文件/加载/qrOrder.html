@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>鸟人咖啡-确认订单</title>
+    <script src="__PUBLIC__/js/jquery-1.8.3.min.js"></script>
+    <script src="__PUBLIC__/js/mui.min.js"></script>
+
+    <link href="__PUBLIC__/css/mui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/swiper.min.css" />
+
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/index.css" />
+    <!-- 自定义日历插件css -->
+    <link href="__ROOT__/Public/calendar-content/content/Content/mobiscroll-2.13.2.full.min.css" rel="stylesheet" />
+    <!--<link rel="stylesheet" href="http://res.wx.qq.com/open/libs/weui/0.4.1/weui.css">-->
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/load_new.css" />
+
+    <script type="text/javascript" charset="utf-8">
+        mui.init();
+    </script>
+
+    <script src="__PUBLIC__/js/rem.js"></script>
+    <style>
+        .mui-checkbox.mui-left label, .mui-radio.mui-left label{padding-left:30px;padding-right:0;}
+        .mui-checkbox.mui-left input[type=checkbox], .mui-radio.mui-left input[type=radio]{left:5px;top:7px}
+        .qrdd-title{display: flex;justify-content: space-between;padding:0!important;border-bottom:1px solid #616161}
+        .time{background: #353535!important;border:0;text-align: right;font-size:13px;padding:0!important;height:auto!important;color:#fecf03}
+        .psfsbox2{border:0!important}
+        #treelist_dummy{    padding: 0;
+            text-align: right;
+            height: auto;
+            background: #353535;color:#fecf03;border:0;font-size:15px;}
+        .qrdd-dizhi{height:.5rem}
+    </style>
+</head>
+
+<body class="bg">
+<include file="Comm/load" />
+<div id="loadingToast" class="weui_loading_toast" style="display:none;position:relative;z-index:99999999999">
+    <div class="weui_mask_transparent"></div>
+    <div class="weui_toast">
+        <div class="weui_loading">
+            <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+            <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+        </div>
+        <p class="weui_toast_content">正在提交订单...</p>
+    </div>
+</div>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left color-8d"></a>
+    <a href="#topPopover" class="mui-icon mui-action-menu mui-icon-bars mui-pull-right color-8d"></a>
+    <h1 class="mui-title color-8d">确认订单</h1>
+</header>
+<div class="mui-content">
+    <form id="qr_sumbit_form" >
+    <div class="dd-box">
+
+        <!--到店自提-->
+        <div class="qrdd-list" style="border-top:0;">
+            <div class="qrdd-title">
+                <div class="mui-input-row mui-radio mui-left" style="width:28%">
+                    <label style="padding-left:0;color:#8d8d8d">给谁喝：</label>
+                </div>
+                <div class="mui-input-row mui-radio mui-left" style="width:36%">
+                    <label>自己喝</label>
+                    <input id="zjh-radio" name="is_qing_freind" checked type="radio" value="0">
+                </div>
+                <div class="mui-input-row mui-radio mui-left" style="width:36%">
+                    <label>送朋友</label>
+                    <input id="spy-radio" name="is_qing_freind" type="radio" value="1">
+                </div>
+
+            </div>
+        </div>
+        <!--配送方式-->
+        <div class="qrdd-list psfsbox" style="border-top:0;padding-top:0;">
+            <div class="qrdd-title">
+                <div class="mui-input-row mui-radio mui-left" style="width:28%">
+                    <label style="padding-left:0;color:#8d8d8d">配送方式：</label>
+                </div>
+                <div class="mui-input-row mui-radio mui-left" style="width:36%">
+                    <label>商家配送</label>
+                    <input class="sjps-radio" name="is_daodian" value="0" checked type="radio">
+                </div>
+                <div class="mui-input-row mui-radio mui-left" style="width:36%">
+                    <label>到店自提</label>
+                    <input class="ddzt" name="is_daodian" value="1" type="radio">
+                </div>
+            </div>
+            <if condition="$cartlist[0]['cart_tag'] eq 0">
+
+                <if condition="!empty($_COOKIE['addr_address'])">
+                        <div class="psdz" id="my_address" data-city='{$Think.cookie.addr_city_name}' data-city_id="{$Think.cookie.addr_city_id}" >
+                            <p class="qrdd-name" style="margin-top:.15rem">送达地址</p>
+                            <p class="qrdd-name">{$Think.cookie.addr_name} &nbsp; {$Think.cookie.addr_phone}</p>
+                            <p class="qrdd-dizhi "><span class="qrdd_t_p3" style="float: none;">{$Think.cookie.addr_address}</span>
+                                <a href="__APP__/shop/Person/addr/t/1"><span>更换地址</span></a>
+                            </p>
+                            <input type='hidden' name='addr_id' value='{$Think.cookie.addr_id}'/>
+                        </div>
+                    <else/>
+                        <div class="psdz" id="my_address" data-city='{$addr_data.addr_city_name}' data-city_id="{$addr_data.addr_city_id}">
+                            <p class="qrdd-name" style="margin-top:.15rem">送达地址</p>
+                            <p class="qrdd-name">{$addr_data.addr_name} &nbsp; {$addr_data.addr_phone}</p>
+                            <p class="qrdd-dizhi"><span class="qrdd_t_p3" style="float: none;">{$addr_data.addr_address}</span>
+                                <a href="__APP__/shop/Person/addr/t/1"><span>更换地址</span></a>
+                            </p>
+                            <input type='hidden' name='addr_id' value='{$addr_data.addr_id}'/>
+                        </div>
+                </if>
+
+
+            </if>
+        </div>
+        <div class="qrdd-list">
+            <p class="qrdd-dizhi">选择门店
+                <span>
+							<select name="store_id" id="store_id" style="color:#fecf03;background: #353535;border:0;font-size:14px;">
+                                <volist name="store" id="vo">
+								    <option value="{$vo.store_id}" >{$vo.store_name}</option>
+								</volist>
+							</select>
+						</span>
+            </p>
+        </div>
+        <!--送达时间-->
+        <div class="qrdd-list">
+            <div class="qrdd-dizhi"><span style="color:#8d8d8d;float:left">送达时间</span>
+                <span>
+                    <ul id="treelist" style='display:none'>
+                        <volist name='array_data_time'  id='vo' key='k'>
+                            <if condition="count($array_data_time) eq 3">
+                                <if condition="$k eq 1">
+                                    <li>
+                                        <span data-date='{$key}'>明天</span>
+                                        <ul>
+                                            <volist name='vo' id='v'>
+                                                <li data-time='{$v}'>{$v}</li>
+                                            </volist>
+                                        </ul>
+                                    </li>
+                                    <elseif condition="$k eq 2"/>
+                                    <li>
+                                        <span  data-date='{$key}'>{$key}</span>
+                                        <ul>
+                                            <volist name='vo' id='v'>
+                                                <li data-time='{$v}'>{$v}</li>
+                                            </volist>
+                                        </ul>
+                                    </li>
+                                    <else/>
+                                    <li>
+                                        <span data-date='{$key}'>{$key}</span>
+                                        <ul>
+                                            <volist name='vo' id='v'>
+                                                <li data-time='{$v}'>{$v}</li>
+                                            </volist>
+                                        </ul>
+                                    </li>
+                                </if>
+                                <else/>
+                                <if condition="$k eq 1">
+                                    <li>
+                                        <span data-date='{$key}'>今天</span>
+                                        <ul>
+                                            <volist name='vo' id='v'>
+                                                <li data-time='{$v}'>{$v}</li>
+                                            </volist>
+                                        </ul>
+                                    </li>
+                                    <elseif condition="$k eq 2"/>
+                                    <li>
+                                        <span data-date='{$key}'>明天</span>
+                                        <ul>
+                                            <volist name='vo' id='v'>
+                                                <li data-time='{$v}'>{$v}</li>
+                                            </volist>
+                                        </ul>
+                                    </li>
+                                    <else/>
+                                    <li>
+                                        <span data-date='{$key}'>{$key}</span>
+                                        <ul>
+                                            <volist name='vo' id='v'>
+                                                <li data-time='{$v}'>{$v}</li>
+                                            </volist>
+                                        </ul>
+                                    </li>
+                                </if>
+                            </if>
+                        </volist>
+                    </ul>
+                </span>
+            </div>
+        </div>
+        <input type="hidden" name='peisongtime' id='peisongtime' value=''/>
+
+        <if condition="$is_phone eq 0">
+            <div class="qrdd_t">
+                <p class="qrdd2_p">为了小哥能够及时联系到您，请验证您本人的手机号码</p>
+                <input type="text" class="qrdd2_input" name='phone' value='' id='phone' placeholder="手机号码">
+                <input type="text" class="qrdd2_input qrdd2_input2" name='phone_code' value='' id='phone_code' placeholder="验证码">
+                <button type="button" class="am-btn am-btn-warning qrdd2_input3"  id='send_phone_code' onclick="change_send_button(this)">获取验证码</button>
+            </div>
+
+            <input type='hidden' name='is_phone' value='1' />
+        </if>
+
+        <!--价格-->
+        <div class="qrdd-list">
+            <volist name="cartlist" id="vo">
+                <p class="qrdd-dizhi">{$vo.cart_goods_name}x{$vo.cart_goods_num}
+                    <span>￥{$vo.cart_goods_price}</span>
+                </p>
+            </volist>
+        </div>
+        <!--使用优惠-->
+        <div class="qrdd-list">
+            <if condition="!empty($_COOKIE['coupon_name'])">
+                <p class="qrdd-dizhi" onclick="window.location.href='__APP__/shop/Person/coupon/tag/1'">使用优惠劵
+                   <span>{$Think.cookie.coupon_name|mb_substr=0,8,'utf-8'}</span>
+                </p>
+                <input type='hidden' name='coupon_use_id' value='{$Think.cookie.coupon_use_id}' id='coupon_use_id'/>
+            <else/>
+                <p class="qrdd-dizhi" onclick="window.location.href='__APP__/shop/Person/coupon/tag/1'">使用优惠劵
+                    <span>></span>
+                </p>
+                <input type='hidden' name='coupon_use_id' value='' id='coupon_use_id'/>
+            </if>
+
+
+            <p class="qrdd-dizhi">使用余额
+                <span><input class="dd-je" style="width:2.8rem;font-size:13px;" type="text" name='user_money' id='user_money' placeholder="您的余额：{$userinfo.user_money}" onkeyup="if(isNaN(value))execCommand('undo');" onkeypress="var index=layer.load(2);calculate_price(index)" onblur="var index=layer.load(2);calculate_price(index)" onafterpaste="if(isNaN(value))execCommand('undo')"/></span>
+            </p>
+            <p class="qrdd-dizhi">使用积分
+                <span>
+                    <input class="dd-je" style="width:2.8rem;font-size:13px;" type="text" name='integral' id='integral' placeholder="您的积分：{$userinfo.my_points}" onkeyup="this.value=this.value.replace(/\D/g,'');" onkeypress="var index=layer.load(2);calculate_price(index)" onblur="var index=layer.load(2);calculate_price(index)"/>
+                </span>
+            </p>
+        </div>
+        <!--金额-->
+        <div class="qrdd-list">
+            <p class="qrdd-dizhi">商品金额
+                <span id='goodsTotalPrice_show'>￥0.00</span>
+            </p>
+            <p class="qrdd-dizhi">配送费
+                <span id='serviceFee_show'>￥0.00</span>
+            </p>
+            <p class="qrdd-dizhi">优惠折扣
+                <span id='discountFee_show'>－￥0.00</span>
+            </p>
+            <p class="qrdd-dizhi">优惠券
+                <span id='couponFee_show'>－￥0.00</span>
+            </p>
+            <p class="qrdd-dizhi">使用余额
+                <span id='user_yue_money_show'>－￥0.00</span>
+            </p>
+            <p class="qrdd-dizhi">使用积分抵扣
+                <span id='user_integral_to_money_show' >－￥0.00</span>
+            </p>
+        </div>
+        <input type='hidden' name='goodsTotalPrice' id='goodsTotalPrice' value='0'/>
+        <input type='hidden' name='serviceFee' id='serviceFee' value='0'/>
+        <input type='hidden' name='discountFee' id='discountFee' value='0'/>
+        <input type='hidden' name='couponFee' id='couponFee' value='0'/>
+
+        <input type='hidden' name='user_yue_money' id='user_yue_money' value='0'/>
+        <input type='hidden' name='user_integral_to_money' id='user_integral_to_money' value='0'/>
+
+        <input type='hidden' name='need_pay_totalprice' id='need_pay_totalprice' value='0'/>
+        <!--备注-->
+        <div class="qrdd-list">
+            <div class="mui-input-row mui-radio">
+                <label style="padding:11px 0 11px 0;color:#8d8d8d;">备注</label>
+                <input style="right:15px" name="is_hot" type="radio" value="0">
+                <span style="position: absolute;top:4px;right:2px;font-size:15px">冷</span>
+                <input style="right:70px" name="is_hot" type="radio" checked value="1">
+                <span style="position: absolute;top:4px;right:57px;font-size:15px">热</span>
+            </div>
+            <div class="dd-text">
+                <textarea name="order_content" id="order_content" placeholder="如有特殊要求：搅拌棒，带糖包等。"></textarea>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label style="padding:11px 0 11px 0;color:#8d8d8d;">祝福语</label>
+
+            </div>
+            <div class="dd-text">
+                <textarea name="xinyunzhufu" placeholder="代写祝福卡，请填写想对TA说的话，不填则默认不送祝福卡。"></textarea>
+            </div>
+        </div>
+        <div style="height:2.5rem"></div>
+    </div>
+    </form>
+    <!--总价-->
+    <div class="dd-bottom bg">
+        <div class="dd-bot-left">
+            <p class="qfl-zj" id='need_pay_totalprice_show'>
+                还需支付：<span class="col-fe" style="font-size:20px;">￥0.00</span>
+            </p>
+        </div>
+        <div class="dd-btm-right" id="sub_btn">去支付</div>
+    </div>
+</div>
+
+</body>
+<script src="__PUBLIC__/js/swiper.min.js"></script>
+
+
+<script src="__PUBLIC__/js/index.js"></script>
+<script>
+    $('#spy-radio').click(function(){
+        $('.psfsbox').find('.sjps-radio').attr('checked',true);
+        $('.psfsbox').find('input').attr('disabled',true)
+    });
+    $('#zjh-radio').click(function(){
+        $('.psfsbox').find('.sjps-radio').attr('checked',true);
+        $('.psfsbox').find('input').removeAttr('disabled');
+    });
+    $('.ddzt').click(function(){
+        $('.psdz').hide();
+        $('.psfsbox').css('border','0')
+        $('.psfsbox').find('.qrdd-title').addClass('psfsbox2')
+    });
+    $('input').click(function(){
+        if($(this).attr('class') != 'ddzt'){
+            $('.psdz').show();
+            $('.psfsbox').find('.qrdd-title').removeClass('psfsbox2')
+        }
+    })
+
+
+</script>
+
+
+
+</html>
+<!-- 自定义日历插件js -->
+<script src="__ROOT__/Public/calendar-content/content/Scripts/mobiscroll-2.13.2.full.min.js"></script>
+
+<script>
+    $(function(){
+        var success_alert=$('#success_alert');
+        var error_alert=$('#error_alert');
+        var success_info=$('#success_info');
+        var error_info=$('#error_info');
+        $.ajax({
+            'url':"{:U('AjaxMessage/index')}",
+            type:'get',
+            dataType:'json',
+            success:function(data){
+                if(data.status==1) {
+                    if(data.type===1){
+                        layer.msg(data.message);
+                    }else{
+                        layer.msg(data.message);
+                    }
+                }
+            }
+        })
+    })
+
+</script>
+
+<script>
+
+    //获取时间范围
+    $(function () {
+        // $('#loadingToast').show();
+        // return false;
+        var i = Math.floor($('#treelist>li').length / 2),
+            j = Math.floor($('#treelist>li').eq(i).find('ul li').length / 2);
+        $("#treelist").mobiscroll().treelist({
+            theme: "android-ics light",
+            lang: "zh",
+            display: 'bottom',//指定显示模式
+            // defaultValue: [i,j],
+            cancelText: null,
+            inputClass:'ui-input',
+            placeholder: '选择时间',
+            headerText: function (valueText) { return "选择时间"; },
+            formatResult: function (array) { //返回自定义格式结果
+              //  alert('time');
+
+                var str='';
+                str=$('#treelist>li').eq(array[0]).children('span').attr('data-date') +' '+ $('#treelist>li').eq(array[0]).find('ul li').eq(array[1]).text().trim(' ');
+                $('#peisongtime').val(str);
+
+                return $('#treelist>li').eq(array[0]).children('span').text() +' '+ $('#treelist>li').eq(array[0]).find('ul li').eq(array[1]).text().trim(' ');
+            }
+        });
+
+        var index=layer.load(2);
+        calculate_price(index);
+    })
+
+    var before_request = 1;
+    //计算价格
+    function calculate_price(index){
+
+        if(before_request == 0) {
+            return false;
+        }
+        before_request = 0;
+
+        var id=$('#coupon_use_id').val();
+        id=id?id:0;
+        var data={'id':id,'user_money':$('#user_money').val(),'integral':$('#integral').val()};
+        $.ajax({
+            url:"{:U('Person/calculatePrice')}",
+            data:data,
+            type:'post',
+            success:function(data){
+                before_request = 1;
+                layer.close(index);
+                if(parseInt(data.status)<0&&data.status=='-2'){
+                    layer.alert(data.msg);
+                    window.location.href="__APP__/Home/Index/goodsList";
+                    return false;
+                }
+                if(data.status!='-2'&&data.status<0){
+                    // layer.alert(data.msg);
+                    layer.msg(data.msg,{icon:2,time:3000});
+                    return false;
+                }
+
+                if(parseInt(data.status)==1){
+
+                    if(data.result.need_pay_totalprice == 0){
+                        //隐藏域
+                        $('#goodsTotalPrice').val(data.result.goodsTotalPrice);
+                        $('#serviceFee').val(data.result.serviceFee);
+                        $('#discountFee').val(data.result.discountFee);
+                        $('#couponFee').val(data.result.couponFee);
+
+                        $('#user_yue_money').val(data.result.user_yue_money);
+                        $('#user_integral_to_money').val(data.result.user_integral_to_money);
+
+                        $('#need_pay_totalprice').val(data.result.need_pay_totalprice);
+
+                        //显示
+                        $('#goodsTotalPrice_show').html('￥'+data.result.goodsTotalPrice);
+                        $('#serviceFee_show').html('￥'+data.result.serviceFee);
+                        $('#discountFee_show').html('-￥'+data.result.discountFee);
+                        $('#couponFee_show').html('-￥'+data.result.couponFee);
+
+                        $('#user_yue_money_show').html('-￥'+data.result.user_yue_money);
+                        $('#user_integral_to_money_show').html('-￥'+data.result.user_integral_to_money);
+
+                        $('#need_pay_totalprice_show').html('还需支付&nbsp;￥<span class="col-fe" style="font-size:20px;">'+data.result.need_pay_totalprice+'</span>');
+                        $('#sub_btn').html('<span  onclick="pay_order2()"> 去提交</span>')
+                    }else{
+                        //隐藏域
+                        $('#goodsTotalPrice').val(data.result.goodsTotalPrice);
+                        $('#serviceFee').val(data.result.serviceFee);
+                        $('#discountFee').val(data.result.discountFee);
+                        $('#couponFee').val(data.result.couponFee);
+
+                        $('#user_yue_money').val(data.result.user_yue_money);
+                        $('#user_integral_to_money').val(data.result.user_integral_to_money);
+
+                        $('#need_pay_totalprice').val(data.result.need_pay_totalprice);
+
+                        //显示
+                        $('#goodsTotalPrice_show').html('￥'+data.result.goodsTotalPrice);
+                        $('#serviceFee_show').html('￥'+data.result.serviceFee);
+                        $('#discountFee_show').html('-￥'+data.result.discountFee);
+                        $('#couponFee_show').html('-￥'+data.result.couponFee);
+
+                        $('#user_yue_money_show').html('-￥'+data.result.user_yue_money);
+                        $('#user_integral_to_money_show').html('-￥'+data.result.user_integral_to_money);
+
+                        $('#need_pay_totalprice_show').html('还需支付&nbsp;￥<span class="col-fe" style="font-size:20px;">'+data.result.need_pay_totalprice+'</span>');
+                        $('#sub_btn').html('<span onclick="pay_order()"> 去支付</span>')
+                    }
+
+                }
+            }
+        });
+    }
+
+    //支付 需支付金额大于0的情况
+    function pay_order(){
+
+        //订单提交加载
+        var $loadingToast = $('#loadingToast');
+        if ($loadingToast.css('display') != 'none') {
+            return;
+        }
+        $loadingToast.show();
+
+        $.ajax({
+            url:"{:U('Person/creatOrderAndPay')}",
+            data:$('#qr_sumbit_form').serialize(),
+            type:'post',
+            success:function(data){
+                $('#loadingToast').hide();
+                if(data.status<0){
+                    layer.msg(data.msg);
+                    return false;
+                }
+                //订单生成成功
+                if(data.status==1){
+                    //alert('订单生成成功');return false;
+                    layer.msg(data.msg);
+                    var a=data.result.a;
+                    var b=data.result.b;
+                    var c=data.result.c;
+                    var info=data.result.info;
+
+                    window.location.href="__APP__/Shop/Person/payJs/x/"+a+"/y/"+b+"/z/"+c+'/info/'+info;
+                }
+            }
+        });
+    }
+
+    //提交订单=已支付 需支付金额等于0的情况
+
+    function pay_order2(){
+
+        //订单提交加载
+        var $loadingToast = $('#loadingToast');
+        if ($loadingToast.css('display') != 'none') {
+            return;
+        }
+        $loadingToast.show();
+
+        $.ajax({
+            url:"{:U('Person/creatOrderAndPay2')}",
+            data:$('#qr_sumbit_form').serialize(),
+            type:'post',
+            success:function(data){
+                $('#loadingToast').hide();
+                if(data.status<0){
+                    layer.msg(data.msg);
+                    return false;
+                }
+                //订单生成成功
+                if(data.status==1){
+                    layer.msg(data.msg);
+                    window.location.href="__APP__/Home/Person/myOrder/success/1.html";
+                }
+            }
+        });
+    }
+</script>
+
+
+<div id="allmap1" style="width:100%;height:300px;border:1px solid gray;display:none;"></div>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<!-- 百度地图 -->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=IHDKmkKAofhZDlUG8Vq2iqFKgQzvDt5c"></script>
+<div  id="allmap" style="display:none"></div>
+<script>
+    $(function(){
+        var index=layer.load(2);
+        // 百度地图API功能
+        var map = new BMap.Map("allmap");
+        var point = new BMap.Point(116.331398,39.897445);
+        map.centerAndZoom(point,12);
+        // 创建地址解析器实例
+        var myGeo = new BMap.Geocoder();
+
+        //获取地址
+        var obj=$('#my_address');
+        var cur_address=obj.find('.qrdd_t_p3').text();
+       // alert(cur_address);
+        var city_name=obj.attr('data-city');
+        var city_id=obj.attr('data-city_id');
+       // alert(city_id);
+        // 将地址解析结果显示在地图上,并调整地图视野
+        if(cur_address!=''&&city_name!=''){
+           // alert(88);
+            myGeo.getPoint(cur_address, function(point){
+                if (point) {
+
+                    map.centerAndZoom(point, 16);
+                    map.addOverlay(new BMap.Marker(point));
+                    getStore(point.lng,point.lat,city_id,index);
+                }else{
+                    layer.alert("您选择地址没有解析到结果!");
+                }
+            }, city_name);
+        }else{
+
+            if(isWeiXin()){
+                //通过config接口注入权限验证配置
+                wx.config({
+                    debug: false,
+                    appId: "{$signPackage['appId']}",
+                    timestamp: "{$signPackage['timestamp']}",
+                    nonceStr: "{$signPackage['nonceStr']}",
+                    signature: "{$signPackage['signature']}",
+                    jsApiList: [
+                        // 所有要调用的 API 都要加到这个列表中
+                        'checkJsApi',
+                        'openLocation',
+                        'getLocation'
+                    ]
+                });
+
+                // 通过ready接口处理成功验证
+                wx.ready(function () {
+
+                    //通过checkJsApi判断当前客户端版本是否支持指定获取地理位置
+                    wx.checkJsApi({
+                        jsApiList: [
+                            'getLocation'
+                        ],
+                        success: function (res) {
+                            // alert(JSON.stringify(res));
+                            // alert(JSON.stringify(res.checkResult.getLocation));
+                            if (res.checkResult.getLocation == false) {
+                                alert('你的微信版本太低，不支持微信JS接口，请升级到最新的微信版本！');
+                                return;
+                            }
+                        }
+                    });
+
+
+
+                    wx.getLocation({
+                        type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                        success: function (res) {
+                            var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                            var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                            var speed = res.speed; // 速度，以米/每秒计
+                            var accuracy = res.accuracy; // 位置精度
+
+
+
+                            var x = longitude;
+                            var y = latitude;
+                            var ggPoint = new BMap.Point(x,y);
+
+                            //地图初始化
+                            var bm = new BMap.Map("allmap1");
+                            bm.centerAndZoom(ggPoint, 15);
+                            bm.addControl(new BMap.NavigationControl());
+                            //坐标转换完之后的回调函数
+                            translateCallback = function (data){
+                                if(data.status === 0) {
+                                    var marker = new BMap.Marker(data.points[0]);
+                                    bm.addOverlay(marker);
+                                    var label = new BMap.Label("您所在位置",{offset:new BMap.Size(20,-10)});
+                                    marker.setLabel(label); //添加百度label
+                                    var p_t=marker.getPosition();//得到图标的位置
+                                    var geoc = new BMap.Geocoder();
+                                    var tmp_point = new BMap.Point(p_t.lng,p_t.lat);
+                                    geoc.getLocation(tmp_point, function(rs){
+                                        getStore(p_t.lng,p_t.lat,0,index);
+                                        layer.close(index);
+
+                                    });
+                                    bm.setCenter(data.points[0]);
+                                }
+                            }
+
+                            setTimeout(function(){
+                                var convertor = new BMap.Convertor();
+                                var pointArr = [];
+                                pointArr.push(ggPoint);
+                                convertor.translate(pointArr, 1, 5, translateCallback)
+                            }, 1000);
+
+
+
+
+                        }
+                    });
+
+                });
+
+
+
+
+            }
+            //判断微信环境结束
+
+        }
+
+    });
+
+    //判断是否是微信内置浏览器
+    function isWeiXin(){
+        var ua = window.navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i) == 'micromessenger'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    //得到门店
+    function getStore(lng,lat,city_id,index){
+        $.ajax({
+            url:"{:U('Person/selectStore')}",
+            data:{'lng':lng,'lat':lat,'id':city_id},
+            type:'post',
+            success:function(data){
+               // alert(JSON.stringify(data));
+                if(data.status=='-1'){
+                    layer.alert(data.msg);
+                    return false;
+                }
+                if(data.status=='1'){
+                    $("#store_id").val(data.result);
+                    layer.close(index);
+                }
+            }
+        });
+    }
+
+    //点击发送验证码按钮触发计时  点击发送验证码之后，进行120秒倒计时，发送验证码
+    var validCode=true;
+    function change_send_button(_this){
+        var time=120;
+        var code=$(_this);
+        if (validCode) {
+            var return_value=getSend();
+            if(!return_value){
+                return false;
+            }
+            validCode=false;
+            code.addClass("msgs1");
+            var t=setInterval(function  () {
+                time--;
+                code.html(time+"秒");
+                if (time==0) {
+                    clearInterval(t);
+                    code.html("重新获取");
+                    validCode=true;
+                    code.removeClass("msgs1");
+
+                }
+            },1000)
+        }
+    }
+
+    /*
+    发送手机验证码
+    */
+
+    function getSend(){
+        var phone=$('#phone').val();
+        var tag=true;
+        if(phone==''){
+            layer.msg('请输入手机号!');
+            tag=false;
+            return false;
+        }
+
+        var myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+        if(!myreg.test(phone))
+        {
+            layer.msg('请输入有效的手机号码！');
+            tag=false;
+            return false;
+        }
+
+
+        $.ajax({
+            url:'{:U('Person/send')}',
+            data:{'phone':phone},
+        async:false,//发送同步请求
+            type:'post',
+            success:function(r){
+
+            if(parseInt(r.status)<0){
+                layer.msg(r.msg);
+                tag=false;
+                return false;
+            }
+            if(r.status==1){
+                layer.msg(r.msg);
+            }
+        }
+    });
+        if(!tag){
+            return false;
+        }
+        return true;
+    }
+
+    function is_dao(d){
+        var vl=$(d).prop('checked');
+        if(vl){
+            $('#my_address').hide();
+        }else{
+            $('#my_address').show();
+        }
+    }
+</script>

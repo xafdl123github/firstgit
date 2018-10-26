@@ -1,0 +1,25 @@
+Q：扫描带参数的二维码，微信会请求接口：attention
+A ： /**
+     *  填写服务器配置 验证token
+     */
+    public function attention(){
+
+        echo '55';exit;
+        $token = "wugong123456";
+        $signature =  I("signature");
+        $timestamp =  I("timestamp");
+        $nonce =  I("nonce");
+        $array = array($token,$timestamp,$nonce);
+        sort($array,SORT_STRING);
+        $str = implode($array);
+        $sign = sha1($str);
+        if($sign == $signature){
+            ob_clean();
+            echo I("echostr");
+            exit;
+        }
+
+   }
+
+Q:  微信退款，设置商户证书路径
+A:  应该写证书在服务器中的路径（D:\...）
