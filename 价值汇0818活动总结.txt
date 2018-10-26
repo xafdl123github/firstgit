@@ -1,6 +1,0 @@
-1，在svn服务器上创建20180818目录
-2，根据http://sync.joinusad.com:82/jzpcprotopic0818.php?pwd=synctopic 在服务器上创建相应的jzpcprotopic0818.php同步文件，并修改其中更新的目录
-3，然后设置相应的目录权限 chown nginx:nginx topic/.svn/ -R
-4，可以测试下，如果出现 “节点处于冲突状态 版本 1813。冲突概要：跳过的路径：1 [stderr]=> [return]=>0”用如下方法：svn up ; svn revert file 命令。
-
-1587.49  1237.62
