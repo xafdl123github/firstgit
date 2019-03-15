@@ -12,6 +12,7 @@ require_once '../lib/WxPay.Notify.php';
 require_once "WxPay.Config.php";
 require_once 'log.php';
 print_r(array(1,2));
+fenzhi
 
 //初始化日志
 $logHandler= new CLogFileHandler("../logs/".date('Y-m-d').'.log');
